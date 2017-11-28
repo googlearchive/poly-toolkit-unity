@@ -1,0 +1,14 @@
+[{
+    "project_name": "poly_toolkit",
+    "project_title": "Poly Toolkit for Unity API Reference",
+    "project_desc": "These are the reference pages for the Unity API.",
+    "target_type": "csharp-unity",
+    "source_path": "Assets/PolyToolkit/Scripts",
+    "source_files": [
+        "**/*.cs"
+    ],
+    "book_path": "/poly/",
+    "project_path": "/poly/",
+    "html_path": "/poly/reference/toolkit/",
+    "stylesheet_file": "/poly/style.css"
+}]

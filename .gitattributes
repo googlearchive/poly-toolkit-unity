@@ -1,0 +1,10 @@
+# Unity generates these with LF, so keep them LF to prevent
+# spurious diffs when Unity overwrites CRLF with LF
+*.mat text eol=lf
+*.asset text eol=lf
+*.meta text eol=lf
+*.unity text eol=lf
+*.prefab text eol=lf
+
+# Resharper generates these with LF; keep them LF even on Windows
+*.DotSettings text eol=lf

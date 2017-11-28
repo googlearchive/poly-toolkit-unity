@@ -1,0 +1,18 @@
+ATTRIBUTIONS
+
+computer:
+
+   Title: "Computer"
+   Author: Poly by Google
+   URL: https://poly.google.com/view/2EHvZLax4Y3
+   License: Creative Commons 3.0
+     https://creativecommons.org/licenses/by/3.0/legalcode
+
+goblets:
+
+   Title: "Goblets - Material Test"
+   Author: Bruno Oliveira
+   URL: https://poly.google.com/view/7cDxjZOsQD8
+   License: Creative Commons 3.0
+     https://creativecommons.org/licenses/by/3.0/legalcode
+
