@@ -42,12 +42,7 @@ public static class PolyApi {
     // (with possibly different config) because that's what happens when the project goes from play
     // mode back to edit mode -- the Poly Toolkit editor code will call PolyApi.Init with the editor
     // config, and in that case we should wipe out our previous state and initialize again.
-    if (PolyMainInternal.IsInitialized) {
-      PolyMainInternal.Shutdown();
-    }
-    if (Authenticator.IsInitialized) {
-      Authenticator.Shutdown();
-    }
+    Shutdown();
     PtSettings.Init();
     PolyMainInternal.Init(authConfig, cacheConfig);
     Authenticator.Initialize(authConfig ?? PtSettings.Instance.authConfig);  
@@ -206,7 +201,8 @@ public static class PolyApi {
   /// Gets an asset by name (id).
   /// </summary>
   /// <param name="name">The name (id) of the asset to get. Note that even though this
-  /// is called 'name', it does not mean the asset's display name, but its unique ID.</param>
+  /// is called 'name', it does not mean the asset's display name, but its unique ID.
+  /// Example: "assets/5vbJ5vildOq".</param>
   /// <param name="callback">The callback to call when the request finishes.</param>
   public static void GetAsset(string name, GetAssetCallback callback) {
     CheckInitialized();
@@ -326,6 +322,22 @@ public static class PolyApi {
     }
 
     return sb.ToString();
+  }
+
+  /// <summary>
+  /// Shuts down the Poly Toolkit runtime API. Calling this method should not normally be necessary
+  /// for most applications. It exists for some very specific use cases, such as writing an editor
+  /// extension that needs to have precise control over initialization and deinitialization of
+  /// components.
+  /// </summary>
+  public static void Shutdown() {
+    if (PolyMainInternal.IsInitialized) {
+      PolyMainInternal.Shutdown();
+    }
+    if (Authenticator.IsInitialized) {
+      Authenticator.Shutdown();
+    }
+    initialized = false;
   }
 }
 }

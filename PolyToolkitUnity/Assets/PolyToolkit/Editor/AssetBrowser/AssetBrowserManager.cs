@@ -79,6 +79,17 @@ public class AssetBrowserManager {
   /// </summary>
   private int queryId = 0;
 
+  /// <summary>
+  /// If true, we are waiting for the initial "silent authentication" to finish.
+  /// </summary>
+  private bool waitingForSilentAuth = false;
+
+  /// <summary>
+  /// If this is not null, we are waiting for the authentication to finish before sending this request.
+  /// This request will be sent as soon as we get the auth callback.
+  /// </summary>
+  private PolyRequest requestToSendAfterAuth = null;
+
   private PolyAuthConfig authConfig = new PolyAuthConfig(
     apiKey: Deobfuscate(API_KEY),
     clientId: Deobfuscate(CLIENT_ID),
@@ -126,6 +137,16 @@ public class AssetBrowserManager {
     PtDebug.Log("ABM initializing...");
     EnsurePolyIsReady();
 
+    // If this is a request that needs authentication and we are in the process of authenticating,
+    // wait until we're finished.
+    bool needAuth = request is PolyListLikedAssetsRequest || request is PolyListUserAssetsRequest;
+    if (needAuth && waitingForSilentAuth) {
+      // Defer the request. Wait until auth is complete.
+      PtDebug.Log("ABM: Deferring request until after auth.");
+      requestToSendAfterAuth = request;
+      return;
+    }
+
     StartRequest(request);
   }
 
@@ -144,7 +165,9 @@ public class AssetBrowserManager {
       // use the default silo.
       authConfig.serviceName = "PolyToolkitEditor";
       PolyApi.Init(authConfig, cacheConfig);
+      waitingForSilentAuth = true;
       PolyApi.Authenticate(interactive: false, callback: (PolyStatus status) => {
+        waitingForSilentAuth = false;
         OnSignInFinished(/* wasInteractive */ false, status);
       });
     }
@@ -299,6 +322,14 @@ public class AssetBrowserManager {
       PtAnalytics.SendEvent(PtAnalytics.Action.ACCOUNT_SIGN_IN_FAILURE, status.ToString());
     }
     if (null != refreshCallback) refreshCallback();
+
+    // If we had a deferred request that was waiting for auth, send it now.
+    if (requestToSendAfterAuth != null) {
+      PtDebug.Log("Sending deferred request that was waiting for auth.");  
+      PolyRequest request = requestToSendAfterAuth;
+      requestToSendAfterAuth = null;
+      StartRequest(request);
+    }
   }
 
   /// <summary>

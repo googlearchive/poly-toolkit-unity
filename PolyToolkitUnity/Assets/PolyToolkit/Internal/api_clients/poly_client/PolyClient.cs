@@ -425,10 +425,14 @@ namespace PolyToolkitInternal.api_clients.poly_client {
     /// <param name="isRecursion">
     ///   If true, this is a recursive call to this function, and no further retries should be attempted.
     /// </param>
-    public void GetAsset(string assetId, Action<PolyStatus,PolyAsset> callback, bool isRecursion = false) {
+    public void GetAsset(string assetId, Action<PolyStatus,PolyAsset> callback, bool isRecursion = false) {  
+      // If the user passed in a raw asset ID (no "assets/" prefix), fix it.
+      if (!assetId.StartsWith("assets/")) {
+        assetId = "assets/" + assetId;
+      }
       PolyMainInternal.Instance.webRequestManager.EnqueueRequest(
         () => {
-          string url = String.Format("{0}/v1/assets/{1}?key={2}", BASE_URL, assetId, PolyMainInternal.Instance.apiKey);
+          string url = String.Format("{0}/v1/{1}?key={2}", BASE_URL, assetId, PolyMainInternal.Instance.apiKey);
           return GetRequest(url, "text/text");
         },
         (PolyStatus status, int responseCode, byte[] response) => {

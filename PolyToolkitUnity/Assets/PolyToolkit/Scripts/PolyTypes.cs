@@ -694,6 +694,9 @@ namespace PolyToolkit {
     /// in throttled mode. Enumerate this on the main thread to gradually perform necessary main
     /// thread operations like creating meshes, textures, etc (see documentation for PolyImportOptions for
     /// more details).
+    ///
+    /// IMPORTANT: this enumerator is not designed to be used across scene (level) loads. Always finish
+    /// enumerating it before loading a new scene.
     /// </summary>
     public IEnumerable mainThreadThrottler;
 

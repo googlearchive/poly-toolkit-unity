@@ -38,7 +38,7 @@ public class HelloPoly : MonoBehaviour {
   private void Start() {
     // Request the asset.
     Debug.Log("Requesting asset...");
-    PolyApi.GetAsset("5vbJ5vildOq", GetAssetCallback);
+    PolyApi.GetAsset("assets/5vbJ5vildOq", GetAssetCallback);
     statusText.text = "Requesting...";
   }
 
