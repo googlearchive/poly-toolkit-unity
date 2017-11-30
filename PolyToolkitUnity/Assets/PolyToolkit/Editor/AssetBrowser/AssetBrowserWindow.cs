@@ -1014,7 +1014,9 @@ public class AssetBrowserWindow : EditorWindow {
     guiHelper.EndHorizontal();
     GUILayout.Space(5);
     
-    if (File.Exists(PtUtils.ToAbsolutePath(ptAssetLocalPath))) {
+    if (!File.Exists(PtUtils.ToAbsolutePath(ptAssetLocalPath))) {
+      GUILayout.Label(PolyInternalUtils.ATTRIBUTION_NOTICE, EditorStyles.wordWrappedLabel);
+    } else {
       GUILayout.Label("WARNING: The indicated asset already exists and will be OVERWRITTEN by " +
         "the new asset. Existing instances of the old asset will be automatically updated " +
         "to the new asset.",
@@ -1038,6 +1040,7 @@ public class AssetBrowserWindow : EditorWindow {
         PtAnalytics.SendEvent(PtAnalytics.Action.IMPORT_STARTED_FROM_SEARCH,
             GetAssetFormatDescription(selectedAsset));
       }
+
       manager.StartDownloadAndImport(selectedAsset, ptAssetLocalPath, importOptions);
     }
   }

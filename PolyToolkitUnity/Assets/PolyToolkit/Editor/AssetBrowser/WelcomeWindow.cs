@@ -38,7 +38,7 @@ public class WelcomeWindow : EditorWindow {
   private const string ONLINE_DOCUMENTATION_URL = "https://developers.google.com/poly/develop/unity";
 
   private const int DEFAULT_WIDTH = 500;
-  private const int DEFAULT_HEIGHT = 400;
+  private const int DEFAULT_HEIGHT = 500;
   private const int WELCOME_TEX_WIDTH = 500;
   private const int WELCOME_TEX_HEIGHT = 150;
 
@@ -97,6 +97,7 @@ public class WelcomeWindow : EditorWindow {
         "The Poly Toolkit window was added to your editor. You can use it as a separate " +
         "window or dock like any tool window. If you close it, you can access it again " +
         "from the Poly menu.\n\n" +
+        PolyInternalUtils.ATTRIBUTION_NOTICE + "\n\n" +
         "Have fun!",
         EditorStyles.wordWrappedLabel);
 
