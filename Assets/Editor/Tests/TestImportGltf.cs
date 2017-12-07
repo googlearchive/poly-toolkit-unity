@@ -158,7 +158,7 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Save as Separate")]
+  [MenuItem("Poly/Dev/Test/Save as Separate")]
   public static void TestSaveAsSeparateWithMeshesInAsset() {
     IUriLoader binLoader = new BufferedStreamLoader(Path.GetDirectoryName(Path.Combine(RepoRoot, kAllBrush10)));
     ImportGltf.GltfImportResult result = null;
@@ -172,7 +172,7 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Save as Single")]
+  [MenuItem("Poly/Dev/Test/Save as Single")]
   public static void TestSaveAsSinglePrefab() {
     IUriLoader binLoader = new BufferedStreamLoader(Path.GetDirectoryName(Path.Combine(RepoRoot, kMoto)));
     ImportGltf.GltfImportResult result = null;
@@ -208,7 +208,7 @@ internal class TestImportGltf {
     }
   }
 
-  [MenuItem("Poly/Test/Import+save selected .gltf assets")]
+  [MenuItem("Poly/Dev/Test/Import+save selected .gltf assets")]
   public static void TestImportSelection() {
     var gltfAssets = Selection.objects
         .Select(o => AssetDatabase.GetAssetPath(o))
@@ -225,19 +225,19 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only/glTF1")]
+  [MenuItem("Poly/Dev/Test/Import only/glTF1")]
   public static void TestImportGltf1() {
     DoImport(Path.Combine(RepoRoot, kAllBrush14), PolyImportOptions.Default());
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only/glTF2, defaults")]
+  [MenuItem("Poly/Dev/Test/Import only/glTF2, defaults")]
   public static void TestImportGltf2() {
     DoImport(Path.Combine(RepoRoot, kComputer), PolyImportOptions.Default());
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only/glTF2, scale x2")]
+  [MenuItem("Poly/Dev/Test/Import only/glTF2, scale x2")]
   public static void TestImportGltf2Scale() {
     PolyImportOptions options = new PolyImportOptions();
     options.rescalingMode = PolyImportOptions.RescalingMode.CONVERT;
@@ -246,7 +246,7 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only/glTF2, target size=50")]
+  [MenuItem("Poly/Dev/Test/Import only/glTF2, target size=50")]
   public static void TestImportGltf2TargetSize() {
     PolyImportOptions options = new PolyImportOptions();
     options.rescalingMode = PolyImportOptions.RescalingMode.FIT;
@@ -255,7 +255,7 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only/glTF2, target size=50, recenter")]
+  [MenuItem("Poly/Dev/Test/Import only/glTF2, target size=50, recenter")]
   public static void TestImportGltf2TargetSizeRecenter() {
     PolyImportOptions options = new PolyImportOptions();
     options.rescalingMode = PolyImportOptions.RescalingMode.FIT;
@@ -265,7 +265,7 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Test/Import only (GLTF2, transparent)")]
+  [MenuItem("Poly/Dev/Test/Import only (GLTF2, transparent)")]
   public static void TestImportGltf2Transparent() {
     DoImport(Path.Combine(RepoRoot, kGoblets), PolyImportOptions.Default());
   }

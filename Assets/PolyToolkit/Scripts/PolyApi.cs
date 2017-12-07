@@ -302,12 +302,18 @@ public static class PolyApi {
   public static string GenerateAttributions(bool includeStatic = true, List<PolyAsset> runtimeAssets = null) {
     StringBuilder sb = new StringBuilder();
     
+    bool hasHeader = false;
     if (includeStatic) {
       // Append static file first, because it includes the header.
       TextAsset staticAttributionFile = Resources.Load<TextAsset>(
         Path.GetFileNameWithoutExtension(AttributionGeneration.ATTRIB_FILE_NAME));
-      sb.Append(staticAttributionFile.text);
-    } else {
+      if (staticAttributionFile != null) {
+        sb.Append(staticAttributionFile.text);
+        hasHeader = true;
+      }
+    }
+
+    if (!hasHeader) {
       sb.Append(AttributionGeneration.FILE_HEADER).AppendLine();
     }
 

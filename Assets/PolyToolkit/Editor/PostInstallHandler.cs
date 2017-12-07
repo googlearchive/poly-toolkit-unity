@@ -17,8 +17,6 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using PolyToolkitInternal;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PolyToolkitEditor {
 
@@ -26,6 +24,10 @@ namespace PolyToolkitEditor {
 public class PostInstallHandler {
   static PostInstallHandler() {
     if (Application.isPlaying) return;
+
+    // Don't run the upgrade logic in the Poly Toolkit source project. We only want it to run
+    // when users have installed it.
+    if (Application.companyName == "Google" && Application.productName == "PolyToolkitUnity") return;
 
     // Add HandlePostInstall method to the Editor update loop so it runs after the rest of
     // PolyToolkit has been initialized.
@@ -44,17 +46,17 @@ public class PostInstallHandler {
     try {
       currentVersion = File.ReadAllText(upgradeFilePath).Trim();
     } catch (Exception) {}
-    if (currentVersion != PtSettings.Version.ToString()) {
-       isUpgrade = !string.IsNullOrEmpty(currentVersion);
-      // Show the welcome window.
-      WelcomeWindow.ShowWelcomeWindow();
-      AssetBrowserWindow.BrowsePolyAssets();
-      File.WriteAllText(upgradeFilePath, PtSettings.Version.ToString());
-    }
-    
+
+    if (currentVersion == PtSettings.Version.ToString()) return;
+    isUpgrade = !string.IsNullOrEmpty(currentVersion);
+    // Show the welcome window.
+    WelcomeWindow.ShowWelcomeWindow();
+    AssetBrowserWindow.BrowsePolyAssets();
+    File.WriteAllText(upgradeFilePath, PtSettings.Version.ToString());
+
     // In the future, if we need to do any post-upgrade maintenance, we can add it here.
     PtAnalytics.SendEvent(isUpgrade ? PtAnalytics.Action.INSTALL_UPGRADE
-      : PtAnalytics.Action.INSTALL_NEW, PtSettings.Version.ToString());
+      : PtAnalytics.Action.INSTALL_NEW_2, PtSettings.Version.ToString());
   }
 }
 }

@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using PolyToolkit;
+using PolyToolkitInternal;  // NO_POLY_TOOLKIT_INTERNAL_CHECK
 
 // PolyToolkitDev namespace is for classes that exist only for developing Poly Toolkit itself,
 // and don't ship out to users in the build.
@@ -85,17 +88,19 @@ static class BuildPackage {
 
   /// Creates a .unitypackage file named after the current git version.
   /// Writes to the root of the git repo.
-  [MenuItem("Poly/Build .unitypackage")]
+  [MenuItem("Poly/Dev/Build .unitypackage")]
   static void DoBuild() {
     string version = GetGitVersion();
     string name = string.Format("../poly-toolkit-{0}.unitypackage", version);
 
     using (var tmp = new TempBuildStamp(version)) {
-      AssetDatabase.ExportPackage(
-        GetFilesToExport(),
-        name,
-        ExportPackageOptions.Recurse);
-      Debug.LogFormat("Done building {0}", name);
+      using (var prepareSettings = new TempPrepareSettingsForExport()) {
+        AssetDatabase.ExportPackage(
+          GetFilesToExport(),
+          name,
+          ExportPackageOptions.Recurse);
+        Debug.LogFormat("Done building {0}", name);
+      }
     }
   }
 
@@ -108,6 +113,39 @@ static class BuildPackage {
       .Where(s => !s.Contains("upgrade.dat"));
     // Correct the path so it is relative to the package.
     return files.Select(x => x.Replace(Application.dataPath, "Assets")).ToArray();
+  }
+
+  /// <summary>
+  /// This object temporarily configures the project (to allow unitypackage export),
+  /// and reverts the configuration back after it is disposed.
+  /// Use this in a using{} block while exporting.
+  /// </summary>
+  private class TempPrepareSettingsForExport : IDisposable {
+    private PolyAuthConfig oldAuthConfig;
+
+    public TempPrepareSettingsForExport() {
+      oldAuthConfig = ResetToPlaceholderCredentials();
+    }
+
+    public void Dispose() {
+      // Restore old auth config.
+      PtSettings.Instance.authConfig = oldAuthConfig;
+      EditorUtility.SetDirty(PtSettings.Instance);
+    }
+  }
+
+  /// <summary>
+  /// Resets the API credentials to placeholder ones.
+  /// </summary>
+  /// <returns>The previous auth credentials.</returns>
+  public static PolyAuthConfig ResetToPlaceholderCredentials() {
+    PolyAuthConfig oldAuthConfig = PtSettings.Instance.authConfig;
+    // Replace by a placeholder auth config during export.
+    PtSettings.Instance.authConfig = new PolyAuthConfig(
+        apiKey: "** INSERT YOUR API KEY HERE **", clientId: "", clientSecret: "");
+    EditorUtility.SetDirty(PtSettings.Instance);
+    AssetDatabase.SaveAssets();
+    return oldAuthConfig;
   }
 }
 

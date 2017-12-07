@@ -58,7 +58,8 @@ public static class PtAnalytics {
     IMPORT_STARTED,
     IMPORT_STARTED_FROM_SEARCH,
     IMPORT_SUCCESSFUL,
-    INSTALL_NEW,
+    // Due to a bug in how INSTALL_NEW was collected, this was renamed to INSTALL_NEW_2.
+    INSTALL_NEW_2,
     INSTALL_UPGRADE,
   }
 

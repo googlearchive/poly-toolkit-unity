@@ -50,7 +50,7 @@ namespace PolyToolkitInternal.entitlement {
     private const string m_UserInfoUri = "https://people.googleapis.com/v1/people/me?requestMask.includeField=person.addresses,person.email_addresses,person.names,person.photos,person.residences";
     private string m_OAuthScope = "profile email " +
       "https://www.googleapis.com/auth/vrassetdata.readonly " +
-      "https://www.googleapis.com/auth/peopleapi.readonly";
+      "https://www.googleapis.com/auth/vrassetdata.readwrite ";
     private const string m_CallbackPath = "/callback";
     private const string m_ReplaceHeadset = "ReplaceHeadset";
     private string m_CallbackFailedMessage = "Sorry!";

@@ -123,14 +123,22 @@ public static class ImportGltf {
   private static GltfRootBase DeserializeGltfRoot(GltfSchemaVersion gltfVersion, JsonTextReader reader) {
     switch (gltfVersion) {
       case GltfSchemaVersion.GLTF1: {
-        var ret = kSerializer.Deserialize<Gltf1Root>(reader);
+        var gltf1Root = kSerializer.Deserialize<Gltf1Root>(reader);
+        if (gltf1Root == null || gltf1Root.nodes == null) {
+          throw new Exception("Failed to parse GLTF1. File is empty or in the wrong format.");
+        }
+
         // Some historical Tilt Brush assets use multiple meshes per node, but the importer
         // assumes single-mesh-per-node.
-        PostProcessRemoveMultipleMeshes(ret);
-        return ret;
+        PostProcessRemoveMultipleMeshes(gltf1Root);
+        return gltf1Root;
       }
       case GltfSchemaVersion.GLTF2:
-        return kSerializer.Deserialize<Gltf2Root>(reader);
+        var gltf2Root= kSerializer.Deserialize<Gltf2Root>(reader);
+        if (gltf2Root == null || gltf2Root.nodes == null) {
+          throw new Exception("Failed to parse GLTF2. File is empty or in the wrong format.");
+        }
+        return gltf2Root;
       default:
         throw new ArgumentException("Invalid gltfVersion" + gltfVersion);
     }

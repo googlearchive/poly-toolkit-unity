@@ -61,6 +61,8 @@ public class PolyImporter : AssetPostprocessor {
         } catch (Exception ex) {
           Debug.LogErrorFormat("Import error: {0}", ex);  
           PtAnalytics.SendException(ex, isFatal: false);
+          EditorUtility.DisplayDialog("Error",
+              "There was an error importing the asset. Please check the logs for more information.", "OK");
         }
         importRequests.Remove(localAssetPath);
       }
@@ -95,16 +97,19 @@ public class PolyImporter : AssetPostprocessor {
 
     // First, import the GLTF and build a GameObject from it.
     EditorUtility.DisplayProgressBar(PROGRESS_BAR_TITLE, PROGRESS_BAR_TEXT, 0.5f);
-    // Use a SanitizedPath stream loader because any format file we have downloaded and saved to disk we
-    // have replaced the original relative path string with the MD5 string hash. This custom stream loader
-    // will always convert uris passed to it to this hash value, and read them from there.
-    IUriLoader binLoader = new HashedPathBufferedStreamLoader(Path.GetDirectoryName(gltfFullPath));
     ImportGltf.GltfImportResult result = null;
-    using (TextReader reader = new StreamReader(gltfFullPath)) {
-      result = ImportGltf.Import(isGltf2 ? GltfSchemaVersion.GLTF2 : GltfSchemaVersion.GLTF1,
-        reader, binLoader, request.options.baseOptions);
+    try {
+      // Use a SanitizedPath stream loader because any format file we have downloaded and saved to disk we
+      // have replaced the original relative path string with the MD5 string hash. This custom stream loader
+      // will always convert uris passed to it to this hash value, and read them from there.
+      IUriLoader binLoader = new HashedPathBufferedStreamLoader(Path.GetDirectoryName(gltfFullPath));
+      using (TextReader reader = new StreamReader(gltfFullPath)) {
+        result = ImportGltf.Import(isGltf2 ? GltfSchemaVersion.GLTF2 : GltfSchemaVersion.GLTF1,
+          reader, binLoader, request.options.baseOptions);
+      }
+    } finally {
+      EditorUtility.ClearProgressBar();
     }
-    EditorUtility.ClearProgressBar();
     string baseName = PtUtils.GetPtAssetBaseName(request.polyAsset);
     result.root.name = baseName;
 

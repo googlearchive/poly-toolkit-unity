@@ -34,14 +34,15 @@ MonoBehaviour:
       scaleFactor: 1
       desiredSize: 1
       recenter: 1
-      throttled: 0
+      clientThrottledMainThread: 0
     alsoInstantiate: 1
   brushManifest: {fileID: 11400000, guid: 2b3e59298bb8cfc47bddd1e1ea01be06, type: 2}
-  basePbrMaterial: {fileID: 2100000, guid: a24c5cab5717b124889fe758761686b4, type: 2}
-  basePbrTransparentMaterial: {fileID: 2100000, guid: b2b07ce943390e34993803beeb1e8548,
+  basePbrOpaqueDoubleSidedMaterial: {fileID: 2100000, guid: a24c5cab5717b124889fe758761686b4,
+    type: 2}
+  basePbrBlendDoubleSidedMaterial: {fileID: 2100000, guid: b2b07ce943390e34993803beeb1e8548,
     type: 2}
   authConfig:
-    apiKey: '**INSERT YOUR API KEY HERE**'
+    apiKey: '** INSERT YOUR API KEY HERE **'
     clientId: 
     clientSecret: 
     additionalScopes: []
