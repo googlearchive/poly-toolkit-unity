@@ -22,7 +22,12 @@ namespace PolyToolkitEditor {
 [InitializeOnLoad]
 public class CheckBuild : IPreprocessBuild {
   public int callbackOrder { get { return 0; } }
+
+#if UNITY_2018_1_OR_NEWER
+  public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report) {
+#else
   public void OnPreprocessBuild(BuildTarget target, string path) {
+#endif
     CheckApiCompatibilitySetting();
     // In the future, we can add other checks here.
   }

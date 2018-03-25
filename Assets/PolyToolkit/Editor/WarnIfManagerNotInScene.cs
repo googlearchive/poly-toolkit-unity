@@ -23,7 +23,12 @@ class WarnIfManagerNotInScene : IProcessScene, IPostprocessBuild {
 
   public int callbackOrder { get { return 0; } }
 
+#if UNITY_2018_1_OR_NEWER
+  public void OnProcessScene(UnityEngine.SceneManagement.Scene scene,
+			UnityEditor.Build.Reporting.BuildReport report) {
+#else
   public void OnProcessScene(UnityEngine.SceneManagement.Scene scene) {
+#endif
     if (! sawManager) {
       if (scene.isLoaded) {
         foreach (var gameObject in scene.GetRootGameObjects()) {
@@ -36,7 +41,11 @@ class WarnIfManagerNotInScene : IProcessScene, IPostprocessBuild {
     }
   }
 
+#if UNITY_2018_1_OR_NEWER
+  public void OnPostprocessBuild(UnityEditor.Build.Reporting.BuildReport report) {
+#else
   public void OnPostprocessBuild(BuildTarget target, string path) {
+#endif
     if (! sawManager) {
       Debug.LogWarning("Please add a PolyToolkitManager component to your scene.");
     }
