@@ -22,7 +22,7 @@ Properties {
 CGINCLUDE
   #include "UnityCG.cginc"
   #include "../../../Shaders/Include/Brush.cginc"
-  #include "Assets/PolyToolkit/ThirdParty/Noise/Shaders/Noise.cginc"
+  #include "../../../../../ThirdParty/Noise/Shaders/Noise.cginc"
 
   struct appdata_t {
     float4 vertex : POSITION;

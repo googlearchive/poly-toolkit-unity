@@ -40,7 +40,7 @@ Shader  "Blocks/BlocksGem"  {
   #pragma target 3.0
   #include "../../../Shaders/Include/Brush.cginc"
   // Our adaptation of the GPU Voronoi noise routines:
-  #include "Assets/PolyToolkit/ThirdParty/GPU-Voronoi-Noise/Assets/GPUVoronoiNoise/Shader/BlocksGemGPUVoronoiNoise.cginc"
+  #include "../../../../../ThirdParty/GPU-Voronoi-Noise/Assets/GPUVoronoiNoise/Shader/BlocksGemGPUVoronoiNoise.cginc"
 
   struct Input {
     float2 uv_MainTex;

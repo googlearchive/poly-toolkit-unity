@@ -39,8 +39,8 @@ public class PostInstallHandler {
     EditorApplication.update -= HandlePostInstall;
 
     // Check if user just installed or upgraded Poly Toolkit.
-    string upgradeFilePath = Path.Combine(Path.Combine(Path.Combine(Application.dataPath,
-        "PolyToolkit"), "Editor"), "upgrade.dat");
+    string basePath = PtUtils.GetPtBaseLocalPath();
+    string upgradeFilePath = PtUtils.ToAbsolutePath(basePath + "/upgrade.dat");
     string currentVersion = "";
     bool isUpgrade = false;
     try {

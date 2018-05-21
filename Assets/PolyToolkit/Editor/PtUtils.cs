@@ -17,15 +17,27 @@ using System.IO;
 using System.Text;
 using PolyToolkit;
 using PolyToolkitInternal;
+using UnityEditor;
 
 namespace PolyToolkitEditor {
 
 public static class PtUtils {
   /// <summary>
+  /// Name of the Poly Toolkit manifest file.
+  /// </summary>
+
+  private const string MANIFEST_FILE_NAME = "poly_toolkit_manifest.dat";
+  /// <summary>
+  /// Poly Toolkit base path (normally Assets/PolyToolkit, unless the user moved it).
+  /// This is computed lazily.
+  /// </summary>
+  private static string basePath = null;
+
+  /// <summary>
   /// Normalizes a Unity local asset path: trims, converts back slashes into forward slashes,
   /// removes trailing slash.
   /// </summary>
-  /// <param name="path">The path to normalize (e.g., " Assets\Foo\Bar\Qux  ").</param>
+  /// <param name="path">The path to normalize (e.g., " Assets\Foo/Bar\Qux  ").</param>
   /// <returns>The normalized path (e.g., "Assets/Foo/Bar/Qux")</returns>
   public static string NormalizeLocalPath(string path) {
     path = path.Trim().Replace('\\', '/');
@@ -85,6 +97,48 @@ public static class PtUtils {
       SanitizeToUseAsFileName(asset.displayName),
       SanitizeToUseAsFileName(asset.authorName),
       SanitizeToUseAsFileName(asset.name).Replace("assets_", ""));
+  }
+
+  public static string GetPtBaseLocalPath() {
+    if (basePath != null) return basePath;
+    // Get the root path of the project. Something like C:\Foo\Bar\MyUnityProject
+    string rootPath = Path.GetDirectoryName(Application.dataPath);
+    // Find the poly_toolkit_manifest.data file. That marks the installation path of Poly Toolkit.
+    string[] matches = Directory.GetFiles(Application.dataPath, MANIFEST_FILE_NAME,
+        SearchOption.AllDirectories);
+    if (matches == null || matches.Length == 0) {
+      throw new System.Exception("Could not find base directory for Poly Toolkit (poly_toolkit_manifest.data missing).");
+    } else if (matches.Length > 1) {
+      Debug.LogError("Found more than one Poly Toolkit installation in your project. Make sure there is only one.");
+      // Continue anyway (by "best effort" -- arbitrarily use the first one).
+    }
+    // Found it. Now we have calculate the path relative to rootPath. For that, we have to normalize the
+    // separators because on Windows we normally get an inconsistent mix of '/' and '\'.
+    rootPath = rootPath.Replace('\\', '/');
+    if (!rootPath.EndsWith("/")) rootPath += "/";
+    string manifestPath = matches[0].Replace('\\', '/').Replace(MANIFEST_FILE_NAME, "");
+    // Now rootPath is something like "C:/Foo/Bar/MyUnityProject/"
+    // and manifestPath is something like "C:/Foo/Bar/MyUnityProject/Some/Path/PolyToolkit".
+    // We want to extract the "Some/Path/PolyToolkit" part.
+    if (!manifestPath.StartsWith(rootPath)) {
+      throw new System.Exception(string.Format("Could not find local path from '{0}' (data path is '{1}')",
+          matches[0], Application.dataPath));
+    }
+    // Cache it.
+    basePath = NormalizeLocalPath(manifestPath.Substring(rootPath.Length));
+    return basePath;
+  }
+
+  /// <summary>
+  /// Loads a texture file from the Poly Toolkit installation folder given a relative path
+  /// from the installation folder to the texture.
+  /// </summary>
+  /// <param name="relativePath">The relative path were the texture is located. For example,
+  /// this could be Editor/Textures/PolyToolkitTitle.png.</param>
+  /// <returns>The texture.</returns>
+  public static Texture2D LoadTexture2DFromRelativePath(string relativePath) {
+    string basePath = PtUtils.GetPtBaseLocalPath();
+    return AssetDatabase.LoadAssetAtPath<Texture2D>(Path.Combine(basePath, relativePath));
   }
 }
 

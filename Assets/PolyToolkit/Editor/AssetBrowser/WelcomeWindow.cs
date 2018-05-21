@@ -30,7 +30,7 @@ public class WelcomeWindow : EditorWindow {
   /// <summary>
   /// Texture to use for the welcome image.
   /// </summary>
-  private const string WELCOME_TEX = "Assets/PolyToolkit/Editor/Textures/PolyToolkitWelcome.png";
+  private const string WELCOME_TEX = "Editor/Textures/PolyToolkitWelcome.png";
 
   /// <summary>
   /// URL for online documentation page.
@@ -72,7 +72,7 @@ public class WelcomeWindow : EditorWindow {
   }
 
   private void Initialize() {
-    welcomeTex = AssetDatabase.LoadAssetAtPath<Texture2D>(WELCOME_TEX);
+    welcomeTex = PtUtils.LoadTexture2DFromRelativePath(WELCOME_TEX);
     position = new Rect(position.xMin, position.yMin, DEFAULT_WIDTH, DEFAULT_HEIGHT);
   }
 

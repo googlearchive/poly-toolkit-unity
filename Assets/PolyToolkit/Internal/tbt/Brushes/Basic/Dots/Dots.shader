@@ -43,7 +43,7 @@ Category {
       #include "UnityCG.cginc"
       #include "../../../Shaders/Include/Brush.cginc"
       #include "../../../Shaders/Include/Particles.cginc"
-      #include "Assets/PolyToolkit/ThirdParty/Noise/Shaders/Noise.cginc"
+      #include "../../../../../ThirdParty/Noise/Shaders/Noise.cginc"
 
       sampler2D _MainTex;
       fixed4 _TintColor;

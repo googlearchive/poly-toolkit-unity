@@ -34,12 +34,14 @@ public class WarnAboutUsingPolyInternal {
     "These are the files that seem to be using private Poly Toolkit classes:\n\n";
 
   static WarnAboutUsingPolyInternal() {
+    string basePath = PtUtils.GetPtBaseLocalPath();
+
     List<string> offendingFiles = new List<string>();
     foreach (string asset in AssetDatabase.GetAllAssetPaths()) {
       // Only check .cs files.
       if (!asset.EndsWith(".cs")) continue;
       // Don't check Poly Toolkit script files.
-      if (asset.Contains("Assets/PolyToolkit")) continue;
+      if (asset.StartsWith(basePath + "/")) continue;
       // If we got here, this is a user-defined script file. Let's check that it's not using PolyToolkitInternal.
       // Note that the asset database cannot always be trusted; sometimes the assets do not exist.
       string contents;

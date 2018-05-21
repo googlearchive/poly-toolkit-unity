@@ -105,27 +105,27 @@ public class AssetBrowserWindow : EditorWindow {
   /// <summary>
   /// Texture to use for the title bar.
   /// </summary>
-  private const string TITLE_TEX = "Assets/PolyToolkit/Editor/Textures/PolyToolkitTitle.png";
+  private const string TITLE_TEX = "Editor/Textures/PolyToolkitTitle.png";
   
   /// <summary>
   /// Texture to use for the back button (back arrow) if the skin is Unity pro.
   /// </summary>
-  private const string BACK_ARROW_LIGHT_TEX = "Assets/PolyToolkit/Editor/Textures/BackArrow.png";
+  private const string BACK_ARROW_LIGHT_TEX = "Editor/Textures/BackArrow.png";
 
   /// <summary>
   /// Texture to use for the back button (back arrow) if the skin is Unity personal.
   /// </summary>
-  private const string BACK_ARROW_DARK_TEX = "Assets/PolyToolkit/Editor/Textures/BackArrowDark.png";
+  private const string BACK_ARROW_DARK_TEX = "Editor/Textures/BackArrowDark.png";
   
   /// <summary>
   /// Texture to use for the back button bar background if the skin is Unity pro.
   /// </summary>
-  private const string DARK_GREY_TEX = "Assets/PolyToolkit/Editor/Textures/DarkGrey.png";
+  private const string DARK_GREY_TEX = "Editor/Textures/DarkGrey.png";
   
   /// <summary>
   /// Texture to use for the back button bar background if the skin is Unity personal.
   /// </summary>
-  private const string LIGHT_GREY_TEX = "Assets/PolyToolkit/Editor/Textures/LightGrey.png";
+  private const string LIGHT_GREY_TEX = "Editor/Textures/LightGrey.png";
 
   /// <summary>
   /// Category key corresponding to selecting the "FEATURED" section.
@@ -311,11 +311,11 @@ public class AssetBrowserWindow : EditorWindow {
       manager = new AssetBrowserManager();
       manager.SetRefreshCallback(UpdateUi);
     }
-    loadingTex = new Texture2D(192, 192);
-    titleTex = AssetDatabase.LoadAssetAtPath<Texture2D>(TITLE_TEX);
-    backArrowTex = AssetDatabase.LoadAssetAtPath<Texture2D>(
+    loadingTex = new Texture2D(1,1);
+    titleTex = PtUtils.LoadTexture2DFromRelativePath(TITLE_TEX);
+    backArrowTex = PtUtils.LoadTexture2DFromRelativePath(
       EditorGUIUtility.isProSkin ? BACK_ARROW_LIGHT_TEX : BACK_ARROW_DARK_TEX);
-    backBarBackgroundTex = AssetDatabase.LoadAssetAtPath<Texture2D>(
+    backBarBackgroundTex = PtUtils.LoadTexture2DFromRelativePath(
       EditorGUIUtility.isProSkin ? DARK_GREY_TEX : LIGHT_GREY_TEX);
 
     detailsTitleStyle = new GUIStyle(EditorStyles.wordWrappedLabel);
