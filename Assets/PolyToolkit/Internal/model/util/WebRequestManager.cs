@@ -46,23 +46,13 @@ namespace PolyToolkitInternal.client.model.util {
     public const long CACHE_ANY_AGE = -1;
 
     /// <summary>
-    /// Maximum number of concurrent downloads to allow. This indicates how many download buffers we should keep.
+    /// Maximum number of concurrent downloads to allow.
     /// </summary>
+#if UNITY_STANDALONE
     private const int MAX_CONCURRENT_DOWNLOADS = 8;
-
-    /// <summary>
-    /// Initial size of the pre-allocated data buffer.
-    /// The data buffer is re-allocated when needed, but we want to avoid doing that because it's
-    /// expensive and will happen in the UI thread, so we need to start out with a reasonably large
-    /// size to handle the data we will download.
-    /// </summary>
-    private const int DATA_BUFFER_INIT_SIZE = 128 * 1024 * 1024;  // 128MB
-
-    /// <summary>
-    /// Size of the temporary buffer used to receive data. This is for a temporary buffer used
-    /// by Unity to transfer data to us.
-    /// </summary>
-    private const int TEMP_BUFFER_SIZE = 2 * 1024 * 1024;  // 2MB
+#else
+    private const int MAX_CONCURRENT_DOWNLOADS = 4;
+#endif
 
     /// <summary>
     /// Delegate that creates a UnityWebRequest. This is used by client code to set up a UnityWebRequest
@@ -113,10 +103,8 @@ namespace PolyToolkitInternal.client.model.util {
     /// that each of our active coroutines owns one BufferHolder.
     /// </summary>
     private class BufferHolder {
-      // Temporary buffer used by Unity to transfer data to us.
-      public byte[] tempBuffer = new byte[TEMP_BUFFER_SIZE];
-      // Permanent buffer in which we accumulate data as we receive.
-      public byte[] dataBuffer = new byte[DATA_BUFFER_INIT_SIZE];
+      // TODO: use pre-allocated buffers for downloading.
+      // (For now, this object serves as a "token" whose availability controls the maximum concurrent downloads).
     }
 
     /// <summary>
