@@ -34,7 +34,6 @@ namespace PolyToolkitInternal.entitlement {
       public string id;
       public string name;
       public string email;
-      public string location;
       public Sprite icon;
     }
 
@@ -47,7 +46,7 @@ namespace PolyToolkitInternal.entitlement {
     private string m_ClientSecret;
     private const string m_RequestTokenUri = "https://accounts.google.com/o/oauth2/auth";
     private const string m_AccessTokenUri = "https://accounts.google.com/o/oauth2/token";
-    private const string m_UserInfoUri = "https://people.googleapis.com/v1/people/me?requestMask.includeField=person.addresses,person.email_addresses,person.names,person.photos,person.residences";
+    private const string m_UserInfoUri = "https://people.googleapis.com/v1/people/me?requestMask.includeField=person.email_addresses,person.names,person.photos";
     private string m_OAuthScope = "profile email " +
       "https://www.googleapis.com/auth/vrassetdata.readonly " +
       "https://www.googleapis.com/auth/vrassetdata.readwrite ";
@@ -187,7 +186,8 @@ namespace PolyToolkitInternal.entitlement {
 
       UserInfo user = new UserInfo();
       for (int i = 0; i < 2; i++) {
-        using (UnityWebRequest www = UnityWebRequest.Get(m_UserInfoUri)) {
+        string uri = m_UserInfoUri + "&key=" + WWW.EscapeURL(PolyMainInternal.Instance.apiKey);
+        using (UnityWebRequest www = UnityWebRequest.Get(uri)) {
           Authenticate(www);
           yield return UnityCompat.SendWebRequest(www);
           if (www.responseCode == 200) {
@@ -195,9 +195,6 @@ namespace PolyToolkitInternal.entitlement {
             user.id = json["resourceName"].ToString();
             user.name = json["names"][0]["displayName"].ToString();
             string iconUri = json["photos"][0]["url"].ToString();
-            if (json["residences"] != null) {
-              user.location = json["residences"][0]["value"].ToString();
-            }
             if (json["emailAddresses"] != null) {
               foreach (var email in json["emailAddresses"]) {
                 var primary = email["metadata"]["primary"];
