@@ -281,9 +281,10 @@ namespace PolyToolkitInternal.client.model.util {
       if (!UnityCompat.IsNetworkError(webRequest) && cacheAllowed) {
         byte[] data = webRequest.downloadHandler.data;
         if (data != null && data.Length > 0) {
-          byte[] copy = new byte[data.Length];
-          Buffer.BlockCopy(data, 0, copy, 0, data.Length);
-          cache.RequestWrite(webRequest.url, copy);
+          // Note: DownloadHandlerBuffer.data is a copy of the underlying buffer, so we own the
+          // byte array that it returns. This means it's safe to pass it to RequestWrite, which is
+          // asynchronous:
+          cache.RequestWrite(webRequest.url, data);
         }
       }
 
