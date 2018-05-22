@@ -265,8 +265,15 @@ namespace PolyToolkitInternal.client.model.util {
       yield return UnityCompat.SendWebRequest(webRequest);
 
       // Request is finished. Call user-supplied callback.
-      PtDebug.LogVerboseFormat("Web request finished: {0}, HTTP response code {1}, response: {2}",
-        webRequest.url, webRequest.responseCode, webRequest.downloadHandler.text);
+      // We surround this part with "if PtDebug.DEBUG_LOG_VERBOSE" because calling webRequest.downloadHandler.text
+      // is very expensive, and even if verbose logging is off, we would incur the cost of decoding.
+      #pragma warning disable 0162  // Don't warn about unreachable code.
+      if (PtDebug.DEBUG_LOG_VERBOSE) {
+        PtDebug.LogVerboseFormat("Web request finished: {0}, HTTP response code {1}, response: {2}",
+            webRequest.url, webRequest.responseCode, webRequest.downloadHandler.text);
+      }
+      #pragma warning restore 0162  // Don't warn about unreachable code.
+
       PolyStatus status = UnityCompat.IsNetworkError(webRequest) ? PolyStatus.Error(webRequest.error) : PolyStatus.Success();
       request.completionCallback(status, (int)webRequest.responseCode, webRequest.downloadHandler.data);
 
