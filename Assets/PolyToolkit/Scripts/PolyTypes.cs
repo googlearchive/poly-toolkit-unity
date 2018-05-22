@@ -721,4 +721,22 @@ namespace PolyToolkit {
       return AutoStringify.Stringify(this);
     }
   }
+
+  /// <summary>
+  /// Options for fetching a thumbnail.
+  /// </summary>
+  public class PolyFetchThumbnailOptions {
+    /// <summary>
+    /// If nonzero, this is the requested thumbnail image size, in pixels. This is the size
+    /// of the image's largest dimension (width, for most thumbnails).
+    /// This is just a hint that the implementation will try (but is not guaranteed) to honor.
+    /// </summary>
+    public int requestedImageSize { get; private set; }
+
+    public PolyFetchThumbnailOptions() {}
+
+    public void SetRequestedImageSize(int requestedImageSize) {
+      this.requestedImageSize = requestedImageSize;
+    }
+  }
 }

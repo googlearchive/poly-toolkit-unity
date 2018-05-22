@@ -36,6 +36,8 @@ public class AssetBrowserManager {
   private const string DOWNLOAD_PROGRESS_TITLE = "Downloading...";
   private const string DOWNLOAD_PROGRESS_TEXT = "Downloading asset. Please wait...";
 
+  private const int THUMBNAIL_REQUESTED_SIZE = 300;
+
   /// <summary>
   /// If true, we are currently performing a query and waiting for the query result.
   /// </summary>
@@ -382,7 +384,7 @@ public class AssetBrowserManager {
       assetResult = result.Value;
 
       if (!thumbnailCache.TryGet(assetResult.name, out assetResult.thumbnailTexture)) {
-        PolyApi.FetchThumbnail(assetResult, OnThumbnailFetched);
+        FetchThumbnail(assetResult);
       }
     } else {
       Debug.LogError("Error: " + result.Status.errorMessage);
@@ -403,9 +405,15 @@ public class AssetBrowserManager {
         }
       }
       foreach (PolyAsset asset in assetsMissingThumbnails) {
-        PolyApi.FetchThumbnail(asset, OnThumbnailFetched);
+        FetchThumbnail(asset);
       }
     }
+  }
+
+  private void FetchThumbnail(PolyAsset asset) {
+    PolyFetchThumbnailOptions options = new PolyFetchThumbnailOptions();
+    options.SetRequestedImageSize(THUMBNAIL_REQUESTED_SIZE);
+    PolyApi.FetchThumbnail(asset, options, OnThumbnailFetched);
   }
 
   /// <summary>

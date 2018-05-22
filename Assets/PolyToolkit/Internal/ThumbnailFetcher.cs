@@ -26,7 +26,11 @@ namespace PolyToolkitInternal {
     /// </summary>
     private const long CACHE_MAX_AGE_MILLIS = 14 * 24 * 60 * 60 * 1000L;  // A fortnight.
 
+    private const int MIN_REQUESTED_SIZE = 32;
+    private const int MAX_REQUESTED_SIZE = 512;
+
     private PolyAsset asset;
+    private PolyFetchThumbnailOptions options;
     private PolyApi.FetchThumbnailCallback callback;
 
     /// <summary>
@@ -36,8 +40,10 @@ namespace PolyToolkitInternal {
     /// </summary>
     /// <param name="asset">The asset to fetch the thumbnail for.</param>
     /// <param name="callback">The callback to call when done. Can be null.</param>
-    public ThumbnailFetcher(PolyAsset asset, PolyApi.FetchThumbnailCallback callback) {
+    public ThumbnailFetcher(PolyAsset asset, PolyFetchThumbnailOptions options,
+        PolyApi.FetchThumbnailCallback callback) {
       this.asset = asset;
+      this.options = options ?? new PolyFetchThumbnailOptions();
       this.callback = callback;
     }
 
@@ -60,7 +66,12 @@ namespace PolyToolkitInternal {
     }
     
     private UnityWebRequest MakeRequest() {
-      return PolyMainInternal.Instance.polyClient.GetRequest(asset.thumbnail.url, "image/png");
+      string url = asset.thumbnail.url;
+      // If an image size hint was provided, forward it to the server if the server supports it.
+      if (options.requestedImageSize > 0 && url.Contains(".googleusercontent.com/")) {
+        url += "=s" + Mathf.Clamp(options.requestedImageSize, MIN_REQUESTED_SIZE, MAX_REQUESTED_SIZE);
+      }
+      return PolyMainInternal.Instance.polyClient.GetRequest(url, "image/png");
     }
 
     private void ProcessResponse(PolyStatus status, int responseCode, byte[] data) {
@@ -68,7 +79,7 @@ namespace PolyToolkitInternal {
         status = PolyStatus.Error("Thumbnail data was null or empty.");
       }
       if (status.ok) {
-        asset.thumbnailTexture = new Texture2D(192, 192);
+        asset.thumbnailTexture = new Texture2D(1, 1);
         asset.thumbnailTexture.LoadImage(data);
       } else {
         Debug.LogWarningFormat("Failed to fetch thumbnail for asset {0} ({1}): {2}",

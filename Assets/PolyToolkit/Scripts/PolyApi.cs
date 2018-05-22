@@ -268,7 +268,19 @@ public static class PolyApi {
   /// <param name="callback">The callback to call when the fetch finishes (optional).</param>
   public static void FetchThumbnail(PolyAsset asset, FetchThumbnailCallback callback = null) {
     CheckInitialized();
-    PolyMainInternal.Instance.FetchThumbnail(asset, callback);
+    PolyMainInternal.Instance.FetchThumbnail(asset, null, callback);
+  }
+
+  /// <summary>
+  /// Fetches the thumbnail for the given asset.
+  /// </summary>
+  /// <param name="asset">The asset for which to fetch the thumbnail.</param>
+  /// <param name="options">The extra options, if any (can be null).</param>
+  /// <param name="callback">The callback to call when the fetch finishes (optional).</param>
+  public static void FetchThumbnail(PolyAsset asset, PolyFetchThumbnailOptions options,
+      FetchThumbnailCallback callback = null) {
+    CheckInitialized();
+    PolyMainInternal.Instance.FetchThumbnail(asset, options, callback);
   }
 
   /// <summary>

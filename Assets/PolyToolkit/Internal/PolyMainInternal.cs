@@ -222,8 +222,9 @@ namespace PolyToolkitInternal {
     /// <summary>
     /// As documented in PolyApi.FetchThumbnails.
     /// </summary>
-    public void FetchThumbnail(PolyAsset asset, PolyApi.FetchThumbnailCallback callback) {
-      ThumbnailFetcher fetcher = new ThumbnailFetcher(asset, callback);
+    public void FetchThumbnail(PolyAsset asset, PolyFetchThumbnailOptions options,
+        PolyApi.FetchThumbnailCallback callback) {
+      ThumbnailFetcher fetcher = new ThumbnailFetcher(asset, options, callback);
       // ThumbnailFetcher will handle fetching, converting and calling the callback.
       fetcher.Fetch();
     }
