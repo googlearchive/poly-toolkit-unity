@@ -26,16 +26,20 @@ namespace PolyToolkitInternal.api_clients.poly_client {
   ///   Parses the response of a List Assets request from Poly into a PolyListResult.
   /// </summary>
   public class ParseAssetsBackgroundWork : BackgroundWork {
-    private string response;
+    private byte[] response;
     private PolyStatus status;
     private Action<PolyStatus, PolyListAssetsResult> callback;
     private PolyListAssetsResult polyListAssetsResult;
-    public ParseAssetsBackgroundWork(string response, Action<PolyStatus, PolyListAssetsResult> callback) {
+    public ParseAssetsBackgroundWork(byte[] response, Action<PolyStatus, PolyListAssetsResult> callback) {
       this.response = response;
       this.callback = callback;
     }
     public void BackgroundWork() {
-      status = PolyClient.ParseReturnedAssets(response, out polyListAssetsResult);
+      JObject result;
+      status = PolyClient.ParseResponse(response, out result);
+      if (status.ok) {
+        status = PolyClient.ParseReturnedAssets(Encoding.UTF8.GetString(response), out polyListAssetsResult);
+      }
     }
     public void PostWork() {
       callback(status, polyListAssetsResult);
@@ -45,16 +49,20 @@ namespace PolyToolkitInternal.api_clients.poly_client {
   ///   Parses an asset from Poly into a PolyAsset.
   /// </summary>
   public class ParseAssetBackgroundWork : BackgroundWork {
-    private string response;
+    private byte[] response;
     private Action<PolyStatus,PolyAsset> callback;
     private PolyStatus status;
     private PolyAsset polyAsset;
-    public ParseAssetBackgroundWork(string response, Action<PolyStatus,PolyAsset> callback) {
+    public ParseAssetBackgroundWork(byte[] response, Action<PolyStatus,PolyAsset> callback) {
       this.response = response;
       this.callback = callback;
     }
     public void BackgroundWork() {
-      status = PolyClient.ParseAsset(JObject.Parse(response), out polyAsset);
+      JObject result;
+      status = PolyClient.ParseResponse(response, out result);
+      if (status.ok) {
+        status = PolyClient.ParseAsset(result, out polyAsset);
+      }
     }
     public void PostWork() {
       callback(status, polyAsset);
@@ -386,35 +394,10 @@ namespace PolyToolkitInternal.api_clients.poly_client {
               });
             }
           } else {
-            string text = Encoding.UTF8.GetString(response);
-            PolyStatus responseStatus = CheckResponseForError(text);
-            if (!responseStatus.ok) {
-              callback(responseStatus, null);
-              return;
-            }
             PolyMainInternal.Instance.DoBackgroundWork(new ParseAssetsBackgroundWork(
-              text, callback));
+              response, callback));
           }
         }, maxCacheAge);
-    }
-
-    /// <summary>
-    /// Verify if the response can be parsed as json and, if so, that it contains no error token.
-    /// If either conditions are false return a PolyStatusError with relevant information.
-    /// </summary>
-    private PolyStatus CheckResponseForError(string response) {
-      JObject results = new JObject();
-      try {
-        results = JObject.Parse(response);
-      } catch (Exception ex) {
-        return PolyStatus.Error("Failed to parse Poly API response, encountered exception: {0}", ex.Message);
-      }
-      IJEnumerable<JToken> error = results["error"].AsJEnumerable();
-      if (error == null) {
-        return PolyStatus.Success();
-      }
-      return PolyStatus.Error("{0}: {1}", error["code"] != null ? error["code"].ToString() : "(no error code)",
-        error["message"] != null ? error["message"].ToString() : "(no error message)");
     }
 
     /// <summary>
@@ -450,13 +433,7 @@ namespace PolyToolkitInternal.api_clients.poly_client {
               });
             }
           } else {
-            string text = Encoding.UTF8.GetString(response);
-            PolyStatus responseStatus = CheckResponseForError(text);
-            if (!responseStatus.ok) {
-              callback(responseStatus, null);
-              return;
-            }
-            PolyMainInternal.Instance.DoBackgroundWork(new ParseAssetBackgroundWork(text,
+            PolyMainInternal.Instance.DoBackgroundWork(new ParseAssetBackgroundWork(response,
               callback));
           }
         }, DEFAULT_QUERY_CACHE_MAX_AGE_MILLIS);
@@ -474,6 +451,24 @@ namespace PolyToolkitInternal.api_clients.poly_client {
         request.SetRequestHeader("Authorization", string.Format("Bearer {0}", token));
       }
       return request;
+    }
+
+    public static PolyStatus ParseResponse(byte[] response, out JObject result) {
+      try {
+        result = JObject.Parse(Encoding.UTF8.GetString(response));
+        JToken errorToken = result["error"];
+        if (errorToken != null) {
+          IJEnumerable<JToken> error = errorToken.AsJEnumerable();
+          return PolyStatus.Error("{0}: {1}", error["code"] != null ? error["code"].ToString() : "(no error code)",
+              error["message"] != null ? error["message"].ToString() : "(no error message)");
+        } else {
+          return PolyStatus.Success();
+        }
+      } catch (Exception ex) {
+        result = null;
+        return PolyStatus.Error("Failed to parse Poly API response, encountered exception: {0}", ex.Message);
+      }
+
     }
   }
 }
