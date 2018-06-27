@@ -32,7 +32,7 @@ public class PtSettings : ScriptableObject {
   /// Poly Toolkit version number.
   /// </summary>
   public static Version Version {
-    get { return new Version { major = 1, minor = 0 }; }
+    get { return new Version { major = 1, minor = 1 }; }
   }
 
   private static PtSettings instance;

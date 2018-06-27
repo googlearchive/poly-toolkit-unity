@@ -14,7 +14,7 @@ MonoBehaviour:
   m_Guid:
     m_storage: 3d813d82-5839-4450-8ddc-8e889ecd96c7
   m_DurableName: BlocksGlass
-  m_Material: {fileID: 2100000, guid: 537db0387b31e004888533b91562f23d, type: 2}
+  m_Material: {fileID: 2100000, guid: 3d813d82583944508ddc8e889ecd96c7, type: 2}
   m_IsParticle: 0
   m_uv0Size: 0
   m_uv0Semantic: 0

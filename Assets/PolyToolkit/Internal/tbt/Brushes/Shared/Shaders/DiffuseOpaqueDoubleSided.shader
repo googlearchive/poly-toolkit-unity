@@ -23,7 +23,7 @@ Cull Off
 
 CGPROGRAM
 #pragma surface surf Lambert vertex:vert addshadow
-#pragma multi_compile __ TBT_LINEAR_TARGET 
+#pragma multi_compile __ TBT_LINEAR_TARGET
 #pragma target 3.0
 #include "../../../Shaders/Include/Brush.cginc"
 

@@ -32,6 +32,7 @@ internal class TestImportGltf {
   internal const string kAllBrush14 = "TestData/gltf1/All_Brushes_TB14.gltf";
   internal const string kComputer = "TestData/gltf2/computer.gltf";
   internal const string kGoblets = "TestData/gltf2/goblets.gltf";
+  internal const string kShark = "TestData/gltf2-fbx/shark.gltf";
 
   // The root of this git repository
   static string RepoRoot { get {
@@ -188,7 +189,9 @@ internal class TestImportGltf {
     var text = File.ReadAllText(gltfPath);
 
     GltfSchemaVersion version;
-    if (text.Contains("\"version\": \"1")) {
+    if (gltfPath.EndsWith("gltf2")) {
+      version = GltfSchemaVersion.GLTF2;
+    } else if (text.Contains("\"version\": \"1")) {
       version = GltfSchemaVersion.GLTF1;
     } else if (text.Contains("\"version\": \"2")) {
       version = GltfSchemaVersion.GLTF2;
@@ -265,9 +268,15 @@ internal class TestImportGltf {
   }
 
   [Test]
-  [MenuItem("Poly/Dev/Test/Import only (GLTF2, transparent)")]
+  [MenuItem("Poly/Dev/Test/Import only/Goblets (GLTF2 transparent)")]
   public static void TestImportGltf2Transparent() {
     DoImport(Path.Combine(RepoRoot, kGoblets), PolyImportOptions.Default());
+  }
+
+  [Test]
+  [MenuItem("Poly/Dev/Test/Import only/Shark (GLTF2 generated from FBX)")]
+  public static void TestImportGltf2FromFbx() {
+    DoImport(Path.Combine(RepoRoot, kShark), PolyImportOptions.Default());
   }
 
   static void AssertNear(float f1, float f2, float eps=1e-4f) {

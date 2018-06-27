@@ -31,3 +31,7 @@
 # Ignore built unity packages, we don't want to check those in.
 *.unitypackage
 
+
+# Don't commit the Asset Store Tools plugin.
+/Assets/AssetStoreTools/
+/Assets/AssetStoreTools.meta

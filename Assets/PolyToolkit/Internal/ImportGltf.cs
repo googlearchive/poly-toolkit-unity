@@ -767,10 +767,15 @@ public static class ImportGltf {
           // Cap the read range to what's available.
           attribRange.max = accessor.count;
         }
+        Array data;
+        if (!TryGetDataAsArray(accessor, attribRange, semantic, out data)) {
+          // Unrecognized semantic or format. Skip. Warning was already printed.
+          continue;
+        }
         // PadArrayToSize() guarantees that, no matter what, the data array will have enough data to cover
         // all the vertices, even if (due to the problems described above) the accessor is missing
         // some elements. The missing elements will be initialized to zero.
-        Array data = PadArrayToSize(GetDataAsArray(accessor, attribRange, semantic), subset.vertices.Size);
+        data = PadArrayToSize(data, subset.vertices.Size);
         switch (semantic) {
         case "POSITION":
           ChangeBasisAndApplyScale(data, Semantic.Position, state.scaleFactor);
@@ -967,59 +972,80 @@ public static class ImportGltf {
     }
   }
 
+  /// <summary>
   /// Returns the specified range of data from an accessor.
   /// The result is a copy and is safe to mutate.
-  ///
-  /// semantic -
-  ///   Attribute name/semantic, if the accessor is for vertex attributes.
-  ///   May be null. Helps determine the return type.
-  static unsafe Array GetDataAsArray(GltfAccessorBase accessor, IntRange eltRange, string semantic) {
+  /// </summary>
+  /// <param name="accessor">The accessor to read.</param>
+  /// <param name="eltRange">The range of elements to read.</param>
+  /// <param name="semantic">The semantic to use when reading.</param>
+  /// <param name="result">(Out) the result of the read. If this method returns true,
+  /// then this will be an array of the appropriate type for the accessor type
+  /// (Vector2[] for VEC2, for example). If this method returns false, this will be null.</param>
+  /// <returns>True if the data could be fetched; false on failure.</returns>
+  static unsafe bool TryGetDataAsArray(GltfAccessorBase accessor, IntRange eltRange, string semantic, out Array result) {
     const Gltf1Accessor.ComponentType FLOAT = Gltf1Accessor.ComponentType.FLOAT;
     if (accessor.type == "VEC2" && accessor.componentType == FLOAT) {
       var destination = new Vector2[eltRange.Size];
       fixed (void* destPtr = destination) {
         ReadAccessorData(accessor, eltRange, sizeof(Vector2), (IntPtr)destPtr);
       }
-      return destination;
+      result = destination;
+      return true;
     } else if (accessor.type == "VEC3" && accessor.componentType == FLOAT) {
       var destination = new Vector3[eltRange.Size];
       fixed (void* destPtr = destination) {
         ReadAccessorData(accessor, eltRange, sizeof(Vector3), (IntPtr)destPtr);
       }
-      return destination;
+      result = destination;
+      return true;
     } else if (accessor.type == "VEC4" && accessor.componentType == FLOAT) {
       if (semantic.StartsWith("COLOR")) {
         var destination = new Color[eltRange.Size];
         fixed (void* destPtr = destination) {
           ReadAccessorData(accessor, eltRange, sizeof(Color), (IntPtr)destPtr);
         }
-        return destination;
+        result = destination;
+        return true;
       } else {
         var destination = new Vector4[eltRange.Size];
         fixed (void* destPtr = destination) {
           ReadAccessorData(accessor, eltRange, sizeof(Vector4), (IntPtr)destPtr);
         }
-        return destination;
+        result = destination;
+        return true;
       }
     } else if (accessor.type == "SCALAR" && accessor.componentType == FLOAT) {
       var destination = new float[eltRange.Size];
       fixed (void* destPtr = destination) {
         ReadAccessorData(accessor, eltRange, sizeof(float), (IntPtr)destPtr);
       }
-      return destination;
+      result = destination;
+      return true;
     } else if (accessor.type == "SCALAR"
                && accessor.componentType == Gltf1Accessor.ComponentType.UNSIGNED_SHORT) {
       var destination = new ushort[eltRange.Size];
       fixed (void* destPtr = destination) {
         ReadAccessorData(accessor, eltRange, sizeof(ushort), (IntPtr)destPtr);
       }
-      return destination;
+      result = destination;
+      return true;
     } else {
       Debug.LogWarningFormat(
           "Unknown accessor type {0} componentType {1}",
           accessor.type, accessor.componentType);
     }
-    return null;
+    result = null;
+    return false;
+  }
+
+  static Array GetDataAsArray(GltfAccessorBase accessor, IntRange eltRange, string semantic) {
+    Array result;
+    if (!TryGetDataAsArray(accessor, eltRange, semantic, out result)) {
+      throw new Exception(string.Format("Failed to get GLTF data as array from accessor type {0} with semantic {1}",
+          accessor.type, semantic));
+    }
+    return result;
   }
 
   /// Reads (range.Size * elementLength) bytes from the specified point

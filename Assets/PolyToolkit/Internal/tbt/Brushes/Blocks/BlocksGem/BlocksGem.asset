@@ -14,7 +14,7 @@ MonoBehaviour:
   m_Guid:
     m_storage: 232998f8-d357-47a2-993a-53415df9be10
   m_DurableName: BlocksGem
-  m_Material: {fileID: 2100000, guid: 79b25d2d8ffdf4c4eb448df9609dfdc7, type: 2}
+  m_Material: {fileID: 2100000, guid: 232998f8d35747a2993a53415df9be10, type: 2}
   m_IsParticle: 0
   m_uv0Size: 0
   m_uv0Semantic: 0

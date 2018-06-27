@@ -52,7 +52,7 @@ Properties {
       float t = 0.0;
 
       float strokeWidth = abs(v.texcoord.z) * 1.2;
-	   
+
 #ifdef AUDIO_REACTIVE
       t = _BeatOutputAccum.z * 5;
       float waveIntensity = _BeatOutput.z * .1 * strokeWidth;

@@ -21,7 +21,7 @@ namespace PolyToolkitDev {
 
 [InitializeOnLoad]
 public class CheckUnityVersion {
-  private const string SUPPORTED_UNITY_VERSION = "5.6.3p1";
+  private const string SUPPORTED_UNITY_VERSION = "5.6.3f1";
   static CheckUnityVersion() {
     if (Application.unityVersion != SUPPORTED_UNITY_VERSION) {
       EditorUtility.DisplayDialog(
