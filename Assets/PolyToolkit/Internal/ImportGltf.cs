@@ -716,6 +716,14 @@ public static class ImportGltf {
 
     BrushDescriptor desc = GltfMaterialConverter.LookupBrushDescriptor(prim.MaterialPtr);
 
+    if (desc != null) {
+      if (desc.m_bFbxExportNormalAsTexcoord1) {
+        // make the gltf look like what the fbx shaders expect
+        // normals moved to texcoord1
+        prim.ReplaceAttribute("NORMAL", "TEXCOORD_1");
+      }
+    }
+
     ushort[] triangles; {
       GltfAccessorBase accessor = prim.IndicesPtr;
       IntRange range = new IntRange { max = accessor.count };
@@ -735,14 +743,6 @@ public static class ImportGltf {
       // Protect the above invariant. (The copy here is required by C#)
       var subset = readonlySubset;
       subset.vertices.min -= (subset.vertices.min % 4);
-
-      if (desc != null) {
-        if (desc.m_bFbxExportNormalAsTexcoord1) {
-          // make the gltf look like what the fbx shaders expect
-          // normals moved to texcoord1
-          prim.ReplaceAttribute("NORMAL", "TEXCOORD_1");
-        }
-      }
 
       // Vertex data
       HashSet<string> attributeNames = prim.GetAttributeNames();
