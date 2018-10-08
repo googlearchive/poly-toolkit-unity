@@ -200,7 +200,7 @@ public abstract class GltfBufferViewBase {
 
 public abstract class GltfPrimitiveBase {
   [Serializable] public enum Mode { TRIANGLES = 4 }
-  public Mode mode;
+  public Mode mode = Mode.TRIANGLES;
 
   // Not part of the schema; this is for lazy-creation convenience
   // There may be more than one if the gltf primitive is too big for Unity
