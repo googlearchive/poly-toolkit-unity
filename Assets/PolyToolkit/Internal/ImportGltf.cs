@@ -408,9 +408,9 @@ public static class ImportGltf {
       }
     }
     foreach (Transform child in rootTransform) {
-      // XXX: do this here instead? 
-      // child.localPosition += state.translation;
-      child.localScale = child.localScale * state.nodeScaleFactor;
+      // child = MatrixScale(nodeScaleFactor) * child;
+      child.localScale *= state.nodeScaleFactor;
+      child.localPosition *= state.nodeScaleFactor;
     }
     result.materials = matConverter.GetGeneratedMaterials();
   }
@@ -442,7 +442,7 @@ public static class ImportGltf {
       // Default to identity. (obj.localTransform is already identity)
     }
 
-    // Maybe better to have caller apply it?
+    // TODO(pld): Maybe better to have caller apply it and simplify the parameter out of the API
     obj.transform.localPosition += translationToApply;
 
     if (node.Mesh != null) {
@@ -633,10 +633,11 @@ public static class ImportGltf {
     Matrix4x4 destFromSource = Matrix4x4.Scale(Vector3.one * scaleFactor);
     Matrix4x4 sourceFromDest = Matrix4x4.Scale(Vector3.one / scaleFactor);
     return destFromSource * inTargetBasis * sourceFromDest;
-#endif
+#else
+    inTargetBasis[12] *= scaleFactor;
     inTargetBasis[13] *= scaleFactor;
     inTargetBasis[14] *= scaleFactor;
-    inTargetBasis[15] *= scaleFactor;
+#endif
     return inTargetBasis;
   }
 
