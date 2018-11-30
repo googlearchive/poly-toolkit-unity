@@ -56,17 +56,27 @@ public class PolyImporter : AssetPostprocessor {
     foreach (string localAssetPath in importedAssets) {
       ImportRequest request;
       if (importRequests.TryGetValue(localAssetPath, out request)) {
-        try {
-          ExecuteImportRequest(request);
-        } catch (Exception ex) {
-          Debug.LogErrorFormat("Import error: {0}", ex);  
-          PtAnalytics.SendException(ex, isFatal: false);
-          EditorUtility.DisplayDialog("Error",
-              "There was an error importing the asset. Please check the logs for more information.", "OK");
-        }
         importRequests.Remove(localAssetPath);
+        // ExecuteImportRequest needs to create and get pointers to prefabs.
+        // Starting in 2018.3, prefabs require asset processing before they
+        // are fully created. Since Unity doesn't do recursive asset processing,
+        // this means ExecuteImportRequest can't happen in OnPostprocessAllAssets.
+        CoroutineRunner.StartCoroutine(ExecuteImportRequestCoroutine(request));
       }
     }
+  }
+
+  private static IEnumerator<object> ExecuteImportRequestCoroutine(ImportRequest request) {
+    try {
+      ExecuteImportRequest(request);
+    } catch (Exception ex) {
+      Debug.LogErrorFormat("Import error: {0}", ex);
+      PtAnalytics.SendException(ex, isFatal: false);
+      EditorUtility.DisplayDialog("Error",
+        "There was an error importing the asset. Please check the logs for more information.", "OK");
+    }
+
+    yield break;
   }
 
   /// <summary>
@@ -81,7 +91,7 @@ public class PolyImporter : AssetPostprocessor {
     string assetFullPath = PtUtils.ToAbsolutePath(assetLocalPath);
 
     PtAsset assetToReplace = AssetDatabase.LoadAssetAtPath<PtAsset>(assetLocalPath);
-   
+
     GameObject prefabToReplace = null;
     if (assetToReplace != null) {
       if (assetToReplace.assetPrefab == null) {
@@ -91,7 +101,7 @@ public class PolyImporter : AssetPostprocessor {
       }
       prefabToReplace = assetToReplace.assetPrefab;
     }
-    
+
     // Determine if file is glTF2 or glTF1.
     bool isGltf2 = Path.GetExtension(request.gltfLocalPath) == ".gltf2";
 
@@ -168,7 +178,13 @@ public class PolyImporter : AssetPostprocessor {
         PtAnalytics.SendEvent(PtAnalytics.Action.IMPORT_FAILED, "Prefab path error");
         return;
       }
+#if UNITY_2018_3_OR_NEWER
+      bool success;
+      newPrefab = PrefabUtility.SaveAsPrefabAsset(result.root, prefabLocalPath, out success);
+      Debug.Assert(success);
+#else
       newPrefab = PrefabUtility.CreatePrefab(prefabLocalPath, result.root);
+#endif
     }
 
     // Now ensure the asset points to the prefab.

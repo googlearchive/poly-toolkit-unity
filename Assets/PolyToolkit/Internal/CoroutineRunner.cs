@@ -14,6 +14,7 @@
 
 #if UNITY_EDITOR
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,6 +37,17 @@ namespace PolyToolkitInternal {
     /// If not null, the coroutine has yielded the async operation and we're waiting for it to end.
     /// </summary>
     private AsyncOperation currentAsyncOperation = null;
+
+    /// <summary>
+    /// Starts a coroutine. This host-less variant only works when in edit mode.
+    /// </summary>
+    /// <param name="coroutine">The coroutine to run.</param>
+    public static void StartCoroutine(IEnumerator coroutine) {
+      if (Application.isPlaying) {
+        throw new InvalidOperationException("Cannot be in play mode");
+      }
+      StartCoroutine(null, coroutine);
+    }
 
     /// <summary>
     /// Start a coroutine. This will smartly decide whether to use the regular Unity framework or
