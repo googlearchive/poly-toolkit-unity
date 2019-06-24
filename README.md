@@ -1,3 +1,5 @@
+This project is no longer being actively developed or maintained. We recommend directly utilizing the [Poly API](https://developers.google.com/poly/develop/api) to access Poly assets from Unity, and using the existing Unity support for loading Poly compatible asset formats.
+
 # Poly Toolkit for Unity
 
 Copyright (c) 2017 Google Inc. All rights reserved.
